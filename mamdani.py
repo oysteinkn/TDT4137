@@ -1,7 +1,18 @@
-def reason(x, y):
-  variables = fuzzification(x, y)
-  actions = rule_evaluation(variables[0], variables[1])
+from math import *
 
+# Container function
+def reason(x, y):
+  # Intervals on the graph for different actions:
+  actions = {'BrakeHard': (-10, -5), 'SlowDown': (-7, -1), 'None':  (-3, 3), 'SpeedUp': (1, 7), 'FloorIt': (5, 10)}
+  
+  variables = fuzzification(x, y)
+  rule_results = rule_evaluation(variables[0], variables[1])
+  aggregated_results = aggregate(actions, rule_results)
+  center_of_gravity = cog(aggregated_results, actions)
+  action = decide(center_of_gravity, actions)
+
+  print("Center of gravity: %.2f" % center_of_gravity)
+  print("Action:", action)
 
 #Fuzzification
 def fuzzification(x, y):
@@ -19,14 +30,38 @@ def fuzzification(x, y):
 
 #Rule evaluation
 def rule_evaluation(dist, delta):
-  actions = { 'bh': dist['vs'],
-              'sd': min(dist['s'], delta['st']),
-              'n':  min(dist['s'], delta['g']),
-              'su': min(dist['p'], delta['g']),
-              'fi': min (dist['vb'], max(1-delta['g'], 1-delta['gf']))}
-  return actions
+  results = { 'BrakeHard': dist['vs'],
+              'SlowDown': min(dist['s'], delta['st']),
+              'None':  min(dist['s'], delta['g']),
+              'SpeedUp': min(dist['p'], delta['g']),
+              'FloorIt': min (dist['vb'], max(1-delta['g'], 1-delta['gf']))}
+  return results
 
-def 
+#Aggregation of results from rules
+def aggregate(actions, rule_results):
+  # Dictionary to store aggregated results
+  aggregated_results = {'bh': 0, 'sd': 0, 'n': 0, 'su': 0, 'fi': 0}
+  for a in actions.keys():
+    v = 0
+    for i in range(actions[a][0], actions[a][1]):
+      v = v + i
+    aggregated_results[a] = v * rule_results[a]
+  return aggregated_results
+
+#Calculate center of gravity:
+def cog(agg, actions):
+  numerator = sum(agg.values())
+  denominator = 0
+  for k in actions.keys():
+    denominator = denominator + agg[k] * abs(actions[k][0] - actions[k][1])
+  return numerator / denominator
+
+# Choose action from CoG:
+def decide(z, actions):
+  z = floor(z)
+  for a in actions.keys():
+    if z in range(actions[a][0], actions[a][1]):
+      return a
 
 def triangle(pos, x0, x1, x2, clip):
   val = 0.0
@@ -49,3 +84,6 @@ def reverse_grade(pos, x0, x1, clip):
   elif pos >= x1: val = 0.0
   else: val = (pos-x0)/(x1-x0)
   return val
+
+# Reason for the inputs in the assignment:
+reason(3.7, 1.2)
