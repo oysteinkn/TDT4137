@@ -9,7 +9,7 @@ def reason(x, y):
   rule_results = rule_evaluation(variables[0], variables[1])
   aggregated_results = aggregate(actions, rule_results)
   center_of_gravity = cog(aggregated_results, actions)
-  action = decide(center_of_gravity, actions)
+  action = decide(floor(center_of_gravity), actions)
 
   print("Center of gravity: %.2f" % center_of_gravity)
   print("Action:", action)
@@ -48,7 +48,7 @@ def aggregate(actions, rule_results):
     aggregated_results[a] = v * rule_results[a]
   return aggregated_results
 
-#Calculate center of gravity:
+#Calculate center of gravity
 def cog(agg, actions):
   numerator = sum(agg.values())
   denominator = 0
@@ -56,13 +56,13 @@ def cog(agg, actions):
     denominator = denominator + agg[k] * abs(actions[k][0] - actions[k][1])
   return numerator / denominator
 
-# Choose action from CoG:
+# Choose action from CoG
 def decide(z, actions):
-  z = floor(z)
   for a in actions.keys():
     if z in range(actions[a][0], actions[a][1]):
       return a
 
+#Helper functions to calculate fuzzy values:
 def triangle(pos, x0, x1, x2, clip):
   val = 0.0
   if (pos >= x0 and pos <= x1): val = (pos - x0)/(x1-x0)
