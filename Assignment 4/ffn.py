@@ -10,12 +10,9 @@ for i in range(1, 9):        # Add numbers 1-8
 
 # Dataset for testing 
 ds2 = SupervisedDataSet(1, 1)
-ds2.addSample(-1, -1)
-ds2.addSample(-40, -40)
-ds2.addSample(20, 20)
+ds2.addSample(-5, -5)
 ds2.addSample(3.4, 3.4)
-ds2.addSample(6.2, 6.2)
-ds2.addSample(54, 54)
+ds2.addSample(20, 20)
 ds2.addSample(500, 500)
 
 net = buildNetwork(1, 8, 1, hiddenclass=TanhLayer)
